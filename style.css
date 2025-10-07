@@ -28,15 +28,25 @@ body {
 }
 
 .app-container {
-  background-image: url('https://storage.googleapis.com/project-os-frontend/images/12d51c78-9852-401d-a34f-37f191b29bab.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   display: grid;
   grid-template-columns: var(--sidebar-collapsed-width) 1fr;
   grid-template-rows: 1fr;
   min-height: 100vh;
   transition: grid-template-columns 0.3s ease-in-out;
+}
+
+.dashboard-page {
+    background-image: url('https://www.dropbox.com/scl/fi/y6cmedhqzfzu3wyulz509/mediocre-security-companies-cant-change-700x441.jpg?rlkey=72qawycjq0sz0fncbhj8wx2h1&st=gjzd3vv7&dl=1');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.employees-page {
+    background-image: url('https://www.dropbox.com/scl/fi/4gs8ix54jpcw57t0c48v5/75p19-585x390.jpg?rlkey=lbp3qfhm8rwypre7f8bfy8d5y&st=5aijb11l&dl=1');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .app-container.sidebar-expanded {

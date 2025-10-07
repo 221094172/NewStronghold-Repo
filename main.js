@@ -13,6 +13,16 @@ const pages = {
 };
 
 async function navigate(page) {
+  const appContainer = document.querySelector('.app-container');
+  
+  // Remove all page-specific classes
+  for (const pageName in pages) {
+    appContainer.classList.remove(`${pageName}-page`);
+  }
+  
+  // Add the class for the current page
+  appContainer.classList.add(`${page}-page`);
+
   const navItems = document.querySelectorAll('.nav-item');
   navItems.forEach(item => {
     if (item.dataset.page === page) {
