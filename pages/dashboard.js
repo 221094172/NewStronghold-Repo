@@ -1,9 +1,6 @@
 import { db, collection, getDocs } from '../firebase-config.js';
-import { addLog } from '../utils/logger.js';
 
 export async function renderDashboard() {
-  addLog('Dashboard loaded');
-
   const [employeesCount, departmentsCount, servicesCount, purchaseOrdersCount] = await Promise.all([
     getCollectionCount('employees'),
     getCollectionCount('departments'),

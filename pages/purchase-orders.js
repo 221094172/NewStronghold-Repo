@@ -1,10 +1,8 @@
 import { db, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from '../firebase-config.js';
-import { addLog } from '../utils/logger.js';
 
 let purchaseOrders = [];
 
 export async function renderPurchaseOrders() {
-  addLog('Purchase Orders page loaded');
   await loadPurchaseOrders();
 
   return `
@@ -104,7 +102,6 @@ async function loadPurchaseOrders() {
     purchaseOrders = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.error('Error loading purchase orders:', error);
-    addLog('Error loading purchase orders');
   }
 }
 
@@ -136,10 +133,8 @@ window.handlePurchaseOrderSubmit = async function(event) {
   try {
     if (purchaseOrderId) {
       await updateDoc(doc(db, 'purchase_orders', purchaseOrderId), purchaseOrderData);
-      addLog(`Purchase order updated: ${purchaseOrderData.itemName}`);
     } else {
       await addDoc(collection(db, 'purchase_orders'), purchaseOrderData);
-      addLog(`Purchase order added: ${purchaseOrderData.itemName}`);
     }
 
     closePurchaseOrderModal();
@@ -147,7 +142,6 @@ window.handlePurchaseOrderSubmit = async function(event) {
     document.getElementById('pageContent').innerHTML = await renderPurchaseOrders();
   } catch (error) {
     console.error('Error saving purchase order:', error);
-    addLog('Error saving purchase order');
   }
 };
 
@@ -174,11 +168,9 @@ window.deletePurchaseOrder = async function(id) {
 
   try {
     await deleteDoc(doc(db, 'purchase_orders', id));
-    addLog(`Purchase order deleted: ${purchaseOrder.itemName}`);
     await loadPurchaseOrders();
     document.getElementById('pageContent').innerHTML = await renderPurchaseOrders();
   } catch (error) {
     console.error('Error deleting purchase order:', error);
-    addLog('Error deleting purchase order');
   }
 };

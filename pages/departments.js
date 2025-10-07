@@ -1,10 +1,8 @@
 import { db, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from '../firebase-config.js';
-import { addLog } from '../utils/logger.js';
 
 let departments = [];
 
 export async function renderDepartments() {
-  addLog('Departments page loaded');
   await loadDepartments();
 
   return `
@@ -92,7 +90,6 @@ async function loadDepartments() {
     departments = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.error('Error loading departments:', error);
-    addLog('Error loading departments');
   }
 }
 
@@ -122,10 +119,8 @@ window.handleDepartmentSubmit = async function(event) {
   try {
     if (departmentId) {
       await updateDoc(doc(db, 'departments', departmentId), departmentData);
-      addLog(`Department updated: ${departmentData.name}`);
     } else {
       await addDoc(collection(db, 'departments'), departmentData);
-      addLog(`Department added: ${departmentData.name}`);
     }
 
     closeDepartmentModal();
@@ -133,7 +128,6 @@ window.handleDepartmentSubmit = async function(event) {
     document.getElementById('pageContent').innerHTML = await renderDepartments();
   } catch (error) {
     console.error('Error saving department:', error);
-    addLog('Error saving department');
   }
 };
 
@@ -158,11 +152,9 @@ window.deleteDepartment = async function(id) {
 
   try {
     await deleteDoc(doc(db, 'departments', id));
-    addLog(`Department deleted: ${department.name}`);
     await loadDepartments();
     document.getElementById('pageContent').innerHTML = await renderDepartments();
   } catch (error) {
     console.error('Error deleting department:', error);
-    addLog('Error deleting department');
   }
 };

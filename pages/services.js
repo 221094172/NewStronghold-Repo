@@ -1,10 +1,8 @@
 import { db, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from '../firebase-config.js';
-import { addLog } from '../utils/logger.js';
 
 let services = [];
 
 export async function renderServices() {
-  addLog('Services page loaded');
   await loadServices();
 
   return `
@@ -117,7 +115,6 @@ async function loadServices() {
     services = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.error('Error loading services:', error);
-    addLog('Error loading services');
   }
 }
 
@@ -149,10 +146,8 @@ window.handleServiceSubmit = async function(event) {
   try {
     if (serviceId) {
       await updateDoc(doc(db, 'services', serviceId), serviceData);
-      addLog(`Service updated: ${serviceData.clientName} - ${serviceData.serviceType}`);
     } else {
       await addDoc(collection(db, 'services'), serviceData);
-      addLog(`Service added: ${serviceData.clientName} - ${serviceData.serviceType}`);
     }
 
     closeServiceModal();
@@ -160,7 +155,6 @@ window.handleServiceSubmit = async function(event) {
     document.getElementById('pageContent').innerHTML = await renderServices();
   } catch (error) {
     console.error('Error saving service:', error);
-    addLog('Error saving service');
   }
 };
 
@@ -187,11 +181,9 @@ window.deleteService = async function(id) {
 
   try {
     await deleteDoc(doc(db, 'services', id));
-    addLog(`Service deleted: ${service.clientName} - ${service.serviceType}`);
     await loadServices();
     document.getElementById('pageContent').innerHTML = await renderServices();
   } catch (error) {
     console.error('Error deleting service:', error);
-    addLog('Error deleting service');
   }
 };

@@ -1,10 +1,8 @@
 import { db, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from '../firebase-config.js';
-import { addLog } from '../utils/logger.js';
 
 let employees = [];
 
 export async function renderEmployees() {
-  addLog('Employees page loaded');
   await loadEmployees();
 
   return `
@@ -110,7 +108,6 @@ async function loadEmployees() {
     employees = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.error('Error loading employees:', error);
-    addLog('Error loading employees');
   }
 }
 
@@ -143,10 +140,8 @@ window.handleEmployeeSubmit = async function(event) {
   try {
     if (employeeId) {
       await updateDoc(doc(db, 'employees', employeeId), employeeData);
-      addLog(`Employee updated: ${employeeData.name}`);
     } else {
       await addDoc(collection(db, 'employees'), employeeData);
-      addLog(`Employee added: ${employeeData.name}`);
     }
 
     closeEmployeeModal();
@@ -154,7 +149,6 @@ window.handleEmployeeSubmit = async function(event) {
     document.getElementById('pageContent').innerHTML = await renderEmployees();
   } catch (error) {
     console.error('Error saving employee:', error);
-    addLog('Error saving employee');
   }
 };
 
@@ -182,11 +176,9 @@ window.deleteEmployee = async function(id) {
 
   try {
     await deleteDoc(doc(db, 'employees', id));
-    addLog(`Employee deleted: ${employee.name}`);
     await loadEmployees();
     document.getElementById('pageContent').innerHTML = await renderEmployees();
   } catch (error) {
     console.error('Error deleting employee:', error);
-    addLog('Error deleting employee');
   }
 };

@@ -3,7 +3,6 @@ import { renderEmployees } from './pages/employees.js';
 import { renderDepartments } from './pages/departments.js';
 import { renderServices } from './pages/services.js';
 import { renderPurchaseOrders } from './pages/purchase-orders.js';
-import { clearLogs } from './utils/logger.js';
 
 const pages = {
   'dashboard': renderDashboard,
@@ -49,11 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
   sidebarToggle.addEventListener('click', () => {
     const sidebar = document.getElementById('sidebar');
     sidebar.classList.toggle('active');
-  });
-
-  const logClear = document.getElementById('logClear');
-  logClear.addEventListener('click', () => {
-    clearLogs();
   });
 
   navigate('dashboard');
