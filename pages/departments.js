@@ -1,0 +1,168 @@
+import { db, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from '../firebase-config.js';
+import { addLog } from '../utils/logger.js';
+
+let departments = [];
+
+export async function renderDepartments() {
+  addLog('Departments page loaded');
+  await loadDepartments();
+
+  return `
+    <div class="page-header">
+      <h1>Departments</h1>
+      <p>Manage organizational departments</p>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Department List</h2>
+        <button class="btn btn-primary" onclick="openDepartmentModal()">Add Department</button>
+      </div>
+      <div class="table-container">
+        ${departments.length === 0 ? renderEmptyState() : renderDepartmentsTable()}
+      </div>
+    </div>
+
+    <div class="modal" id="departmentModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalTitle">Add Department</h2>
+          <button class="modal-close" onclick="closeDepartmentModal()">&times;</button>
+        </div>
+        <form id="departmentForm" onsubmit="handleDepartmentSubmit(event)">
+          <input type="hidden" id="departmentId">
+          <div class="form-group">
+            <label for="name">Department Name</label>
+            <input type="text" id="name" required>
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" rows="4" required></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" class="btn btn-secondary" onclick="closeDepartmentModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+}
+
+function renderEmptyState() {
+  return `
+    <div class="empty-state">
+      <div class="empty-state-icon">🏢</div>
+      <p>No departments found. Add your first department to get started.</p>
+    </div>
+  `;
+}
+
+function renderDepartmentsTable() {
+  return `
+    <table>
+      <thead>
+        <tr>
+          <th>Department Name</th>
+          <th>Description</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${departments.map(dept => `
+          <tr>
+            <td>${dept.name}</td>
+            <td>${dept.description}</td>
+            <td>
+              <div class="actions">
+                <button class="btn btn-secondary btn-small" onclick="editDepartment('${dept.id}')">Edit</button>
+                <button class="btn btn-danger btn-small" onclick="deleteDepartment('${dept.id}')">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+async function loadDepartments() {
+  try {
+    const querySnapshot = await getDocs(collection(db, 'departments'));
+    departments = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error('Error loading departments:', error);
+    addLog('Error loading departments');
+  }
+}
+
+window.openDepartmentModal = function() {
+  const modal = document.getElementById('departmentModal');
+  document.getElementById('modalTitle').textContent = 'Add Department';
+  document.getElementById('departmentForm').reset();
+  document.getElementById('departmentId').value = '';
+  modal.classList.add('active');
+};
+
+window.closeDepartmentModal = function() {
+  const modal = document.getElementById('departmentModal');
+  modal.classList.remove('active');
+};
+
+window.handleDepartmentSubmit = async function(event) {
+  event.preventDefault();
+
+  const departmentData = {
+    name: document.getElementById('name').value,
+    description: document.getElementById('description').value
+  };
+
+  const departmentId = document.getElementById('departmentId').value;
+
+  try {
+    if (departmentId) {
+      await updateDoc(doc(db, 'departments', departmentId), departmentData);
+      addLog(`Department updated: ${departmentData.name}`);
+    } else {
+      await addDoc(collection(db, 'departments'), departmentData);
+      addLog(`Department added: ${departmentData.name}`);
+    }
+
+    closeDepartmentModal();
+    await loadDepartments();
+    document.getElementById('pageContent').innerHTML = await renderDepartments();
+  } catch (error) {
+    console.error('Error saving department:', error);
+    addLog('Error saving department');
+  }
+};
+
+window.editDepartment = async function(id) {
+  const department = departments.find(dept => dept.id === id);
+  if (!department) return;
+
+  document.getElementById('modalTitle').textContent = 'Edit Department';
+  document.getElementById('departmentId').value = id;
+  document.getElementById('name').value = department.name;
+  document.getElementById('description').value = department.description;
+
+  const modal = document.getElementById('departmentModal');
+  modal.classList.add('active');
+};
+
+window.deleteDepartment = async function(id) {
+  const department = departments.find(dept => dept.id === id);
+  if (!department) return;
+
+  if (!confirm(`Are you sure you want to delete ${department.name}?`)) return;
+
+  try {
+    await deleteDoc(doc(db, 'departments', id));
+    addLog(`Department deleted: ${department.name}`);
+    await loadDepartments();
+    document.getElementById('pageContent').innerHTML = await renderDepartments();
+  } catch (error) {
+    console.error('Error deleting department:', error);
+    addLog('Error deleting department');
+  }
+};
