@@ -183,6 +183,30 @@ body {
   margin: 1rem;
 }
 
+.search-container {
+  display: flex;
+  margin-bottom: 1.5rem;
+}
+
+#searchInput {
+  flex-grow: 1;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px 0 0 6px;
+  font-size: 1rem;
+}
+
+#searchButton {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  background: var(--primary-blue);
+  color: var(--white);
+  border-radius: 0 6px 6px 0;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+
 .page-header {
   margin-bottom: 2rem;
 }
