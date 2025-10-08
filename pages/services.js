@@ -1,9 +1,11 @@
 import { db, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from '../firebase-config.js';
 
 let services = [];
+let filteredServices = [];
 
 export async function renderServices() {
   await loadServices();
+  filteredServices = [...services];
 
   return `
     <div class="page-header">
@@ -14,10 +16,14 @@ export async function renderServices() {
     <div class="card">
       <div class="card-header">
         <h2>Service List</h2>
+        <div class="service-search-container">
+          <i class="fas fa-search"></i>
+          <input type="text" id="serviceSearchInput" placeholder="Search by client or service..." onkeyup="filterServices()">
+        </div>
         <button class="btn btn-primary" onclick="openServiceModal()">Add Service</button>
       </div>
-      <div class="table-container">
-        ${services.length === 0 ? renderEmptyState() : renderServicesTable()}
+      <div class="table-container" id="servicesTableContainer">
+        ${renderServicesTable()}
       </div>
     </div>
 
@@ -78,6 +84,10 @@ function renderEmptyState() {
 }
 
 function renderServicesTable() {
+    if (filteredServices.length === 0) {
+        return renderEmptyState();
+    }
+
   return `
     <table>
       <thead>
@@ -90,7 +100,7 @@ function renderServicesTable() {
         </tr>
       </thead>
       <tbody>
-        ${services.map(service => `
+        ${filteredServices.map(service => `
           <tr>
             <td>${service.clientName}</td>
             <td>${service.serviceType}</td>
@@ -152,7 +162,8 @@ window.handleServiceSubmit = async function(event) {
 
     closeServiceModal();
     await loadServices();
-    document.getElementById('pageContent').innerHTML = await renderServices();
+    filteredServices = [...services];
+    document.getElementById('servicesTableContainer').innerHTML = renderServicesTable();
   } catch (error) {
     console.error('Error saving service:', error);
   }
@@ -182,8 +193,18 @@ window.deleteService = async function(id) {
   try {
     await deleteDoc(doc(db, 'services', id));
     await loadServices();
-    document.getElementById('pageContent').innerHTML = await renderServices();
+    filteredServices = [...services];
+    document.getElementById('servicesTableContainer').innerHTML = renderServicesTable();
   } catch (error) {
     console.error('Error deleting service:', error);
   }
 };
+
+window.filterServices = function() {
+    const searchTerm = document.getElementById('serviceSearchInput').value.toLowerCase();
+    filteredServices = services.filter(service => {
+        return service.clientName.toLowerCase().includes(searchTerm) ||
+               service.serviceType.toLowerCase().includes(searchTerm);
+    });
+    document.getElementById('servicesTableContainer').innerHTML = renderServicesTable();
+}
