@@ -1,8 +1,11 @@
+import Navigo from 'navigo';
 import { renderDashboard } from './pages/dashboard.js';
 import { renderEmployees } from './pages/employees.js';
 import { renderDepartments } from './pages/departments.js';
 import { renderServices } from './pages/services.js';
 import { renderPurchaseOrders } from './pages/purchase-orders.js';
+
+const router = new Navigo('/');
 
 const pages = {
   'dashboard': renderDashboard,
@@ -12,7 +15,7 @@ const pages = {
   'purchase-orders': renderPurchaseOrders
 };
 
-async function navigate(page) {
+async function renderPage(page) {
   const appContainer = document.querySelector('.app-container');
   const mainContent = document.getElementById('mainContent');
 
@@ -26,7 +29,7 @@ async function navigate(page) {
 
   const navItems = document.querySelectorAll('.nav-item');
   navItems.forEach(item => {
-    if (item.dataset.page === page) {
+    if (item.getAttribute('href') === `/${page}`) {
       item.classList.add('active');
     } else {
       item.classList.remove('active');
@@ -85,6 +88,14 @@ async function navigate(page) {
   }
 }
 
+router.on({
+  '/': () => renderPage('dashboard'),
+  '/employees': () => renderPage('employees'),
+  '/departments': () => renderPage('departments'),
+  '/services': () => renderPage('services'),
+  '/purchase-orders': () => renderPage('purchase-orders')
+}).resolve();
+
 document.addEventListener('DOMContentLoaded', () => {
   const sidebarToggle = document.getElementById('sidebarToggle');
   const appContainer = document.querySelector('.app-container');
@@ -93,14 +104,12 @@ document.addEventListener('DOMContentLoaded', () => {
     appContainer.classList.toggle('sidebar-expanded');
   });
 
-  const navItems = document.querySelectorAll('.nav-item');
-  navItems.forEach(item => {
-    item.addEventListener('click', (e) => {
+  const navLinks = document.querySelectorAll('.nav-item');
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
       e.preventDefault();
-      const page = item.dataset.page;
-      navigate(page);
+      const path = e.currentTarget.getAttribute('href');
+      router.navigate(path);
     });
   });
-
-  navigate('dashboard');
 });
