@@ -672,6 +672,23 @@ tr:hover {
   height: auto;
 }
 
+.mission-container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.mission-container p {
+  color: var(--white);
+  text-align: center;
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
 @media (max-width: 768px) {
   .app-container {
     grid-template-columns: 1fr;

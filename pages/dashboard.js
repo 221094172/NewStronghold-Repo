@@ -12,6 +12,9 @@ export async function renderDashboard() {
     <div class="page-header">
       <h1>Dashboard</h1>
       <p>Welcome to Stronghold Tech Security System</p>
+      <div class="mission-container">
+        <p>"At STS, our mission is to provide intelligent, reliable, and intergrated security solutions that protect people, property, and businesses. We are committed to combining cutting-edge technology with profesional expertise to deliver smart surveillance, rapid response, and peace of mind to every client we serve".</p>
+      </div>
     </div>
 
     <div class="stats-grid">
