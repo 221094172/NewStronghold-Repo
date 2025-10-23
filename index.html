@@ -14,7 +14,7 @@
         <div class="sidebar-header">
           <h2 class="logo-text">Stronghold</h2>
           <button class="sidebar-toggle" id="sidebarToggle">
-            <i class="fas fa-angle-right"></i>
+            <i class="fas fa-bars"></i>
           </button>
         </div>
         <nav class="sidebar-nav">
@@ -43,13 +43,39 @@
             <span class="nav-text">Orders</span>
             <span class="tooltip">Orders</span>
           </a>
+          <a href="#" class="nav-item" id="logoutButton">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="nav-text">Logout</span>
+            <span class="tooltip">Logout</span>
+          </a>
         </nav>
       </aside>
 
-      <main class="main-content" id="mainContent">
-        <div id="pageContent"></div>
-      </main>
+      <div class="content-wrapper">
+        <div class="top-bar">
+            <div class="user-profile" id="userProfile">
+                <div class="user-initials" id="userInitials"></div>
+                <div class="user-email-dropdown" id="userEmailDropdown">
+                    <p id="userEmail"></p>
+                </div>
+            </div>
+        </div>
+        <main class="main-content" id="mainContent">
+          <div id="pageContent"></div>
+        </main>
+      </div>
       <div class="overlay" id="overlay"></div>
+    </div>
+
+    <div id="logoutConfirmationModal" class="modal">
+        <div class="modal-content">
+            <h2>Confirm Logout</h2>
+            <p>Are you sure you want to log out?</p>
+            <div class="form-actions">
+                <button id="confirmLogout" class="btn btn-danger">Logout</button>
+                <button id="cancelLogout" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
     </div>
 
     <script type="module" src="/main.js"></script>

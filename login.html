@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In - Stronghold Tech</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="login-page-container">
+    <div class="login-image-panel">
+      <img src="https://www.dropbox.com/scl/fi/eisp3it7ndwi42gbkm6yb/ChatGPT-Image-Oct-7-2025-08_31_35-PM.png?rlkey=wpni23932j6rirdunvmi28dg0&dl=1" alt="Login Image">
+    </div>
+    <div class="login-form-panel">
+      <div class="login-box">
+        <h1>Sign in to Stronghold</h1>
+        <form id="loginForm">
+          <div class="input-group">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="email" placeholder="Email" required>
+          </div>
+          <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" placeholder="Password" required>
+          </div>
+          <button type="submit">Sign In</button>
+          <p id="errorMessage" class="error-message"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/login.js"></script>
+</body>
+</html>

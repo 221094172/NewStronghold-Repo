@@ -1,4 +1,6 @@
 import Navigo from 'navigo';
+import { auth } from './firebase-config.js';
+import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { renderDashboard } from './pages/dashboard.js';
 import { renderEmployees } from './pages/employees.js';
 import { renderDepartments } from './pages/departments.js';
@@ -15,16 +17,24 @@ const pages = {
   'purchase-orders': renderPurchaseOrders
 };
 
+function getInitials(email) {
+    if (!email) return '';
+    const name = email.split('@')[0];
+    const parts = name.split(/[._-]/);
+    if (parts.length > 1) {
+        return (parts[0][0] + (parts[parts.length - 1][0] || '')).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+}
+
 async function renderPage(page) {
   const appContainer = document.querySelector('.app-container');
-  const mainContent = document.getElementById('mainContent');
+  const pageContent = document.getElementById('pageContent');
 
-  // Remove all page-specific classes
   for (const pageName in pages) {
     appContainer.classList.remove(`${pageName}-page`);
   }
   
-  // Add the class for the current page
   appContainer.classList.add(`${page}-page`);
 
   const navItems = document.querySelectorAll('.nav-item');
@@ -52,7 +62,7 @@ async function renderPage(page) {
       pageHtml = await renderFunction();
   }
 
-  mainContent.innerHTML = searchBarHtml + `<div id="pageContent">${pageHtml}</div>`;
+  pageContent.innerHTML = searchBarHtml + pageHtml;
 
   if (page === 'employees' || page === 'departments') {
     const searchInput = document.getElementById('searchInput');
@@ -60,7 +70,7 @@ async function renderPage(page) {
     
     const performSearch = () => {
       const searchTerm = searchInput.value.toLowerCase();
-      const table = mainContent.querySelector('table');
+      const table = pageContent.querySelector('table');
       if (table) {
         const rows = table.querySelectorAll('tbody tr');
 
@@ -88,28 +98,97 @@ async function renderPage(page) {
   }
 }
 
-router.on({
-  '/': () => renderPage('dashboard'),
-  '/employees': () => renderPage('employees'),
-  '/departments': () => renderPage('departments'),
-  '/services': () => renderPage('services'),
-  '/purchase-orders': () => renderPage('purchase-orders')
-}).resolve();
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log('User is signed in:', user);
+    
+    const userProfile = document.getElementById('userProfile');
+    const userInitials = document.getElementById('userInitials');
+    const userEmailDropdown = document.getElementById('userEmailDropdown');
+    const userEmail = document.getElementById('userEmail');
+
+    if (userProfile && userInitials && userEmailDropdown && userEmail) {
+      const email = user.email;
+      const initials = getInitials(email);
+      
+      userInitials.textContent = initials;
+      userEmail.textContent = email;
+
+      userProfile.addEventListener('click', () => {
+        userEmailDropdown.style.display = userEmailDropdown.style.display === 'block' ? 'none' : 'block';
+      });
+
+      window.addEventListener('click', function(e) {
+        if (!userProfile.contains(e.target)) {
+          userEmailDropdown.style.display = 'none';
+        }
+      });
+    }
+
+    router.on({
+      '/': () => renderPage('dashboard'),
+      '/employees': () => renderPage('employees'),
+      '/departments': () => renderPage('departments'),
+      '/services': () => renderPage('services'),
+      '/purchase-orders': () => renderPage('purchase-orders')
+    }).resolve();
+
+  } else {
+    console.log('User is signed out');
+    window.location.href = '/login.html';
+  }
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   const sidebarToggle = document.getElementById('sidebarToggle');
   const appContainer = document.querySelector('.app-container');
 
-  sidebarToggle.addEventListener('click', () => {
-    appContainer.classList.toggle('sidebar-expanded');
-  });
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', () => {
+      appContainer.classList.toggle('sidebar-expanded');
+    });
+  }
 
   const navLinks = document.querySelectorAll('.nav-item');
   navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const path = e.currentTarget.getAttribute('href');
-      router.navigate(path);
+      if(path && path !== '#') { // Check if path is not just '#'
+        router.navigate(path);
+      }
     });
   });
+
+  // Logout functionality
+  const logoutButton = document.getElementById('logoutButton');
+  const logoutConfirmationModal = document.getElementById('logoutConfirmationModal');
+  const confirmLogout = document.getElementById('confirmLogout');
+  const cancelLogout = document.getElementById('cancelLogout');
+
+  if(logoutButton && logoutConfirmationModal) {
+      logoutButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        logoutConfirmationModal.classList.add('active');
+      });
+
+      confirmLogout.addEventListener('click', () => {
+        signOut(auth).then(() => {
+          console.log('User signed out successfully');
+          window.location.href = '/login.html';
+        }).catch((error) => {
+          console.error('Sign out error:', error);
+        });
+      });
+
+      cancelLogout.addEventListener('click', () => {
+        logoutConfirmationModal.classList.remove('active');
+      });
+
+      window.addEventListener('click', (e) => {
+          if (e.target == logoutConfirmationModal) {
+            logoutConfirmationModal.classList.remove('active');
+          }
+      });
+  }
 });
