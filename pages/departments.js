@@ -1,6 +1,7 @@
 import { db, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from '../firebase-config.js';
 //initialize collection to departments
 let departments = [];
+let departmentToDeleteId = null;
 
 export async function renderDepartments() {
   await loadDepartments();
@@ -43,6 +44,17 @@ export async function renderDepartments() {
           </div>
         </form>
       </div>
+    </div>
+
+    <div id="deleteConfirmationModal" class="modal">
+        <div class="modal-content">
+            <h2>Confirm Deletion</h2>
+            <p id="deleteConfirmationMessage"></p>
+            <div class="form-actions">
+                <button id="confirmDelete" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+                <button id="cancelDelete" class="btn btn-secondary" onclick="cancelDelete()">Cancel</button>
+            </div>
+        </div>
     </div>
   `;
 }
@@ -148,13 +160,28 @@ window.deleteDepartment = async function(id) {
   const department = departments.find(dept => dept.id === id);
   if (!department) return;
 
-  if (!confirm(`Are you sure you want to delete ${department.name}?`)) return;
-
-  try {
-    await deleteDoc(doc(db, 'departments', id));
-    await loadDepartments();
-    document.getElementById('pageContent').innerHTML = await renderDepartments();
-  } catch (error) {
-    console.error('Error deleting department:', error);
-  }
+  departmentToDeleteId = id;
+  const modal = document.getElementById('deleteConfirmationModal');
+  const message = document.getElementById('deleteConfirmationMessage');
+  message.textContent = `Are you sure you want to delete ${department.name}?`;
+  modal.classList.add('active');
 };
+
+window.confirmDelete = async function() {
+    if (departmentToDeleteId) {
+        try {
+            await deleteDoc(doc(db, 'departments', departmentToDeleteId));
+            await loadDepartments();
+            document.getElementById('pageContent').innerHTML = await renderDepartments();
+        } catch (error) {
+            console.error('Error deleting department:', error);
+        }
+    }
+    cancelDelete();
+}
+
+window.cancelDelete = function() {
+    const modal = document.getElementById('deleteConfirmationModal');
+    modal.classList.remove('active');
+    departmentToDeleteId = null;
+}

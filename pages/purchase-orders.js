@@ -1,6 +1,7 @@
 import { db, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from '../firebase-config.js';
 
 let purchaseOrders = [];
+let purchaseOrderToDeleteId = null;
 
 export async function renderPurchaseOrders() {
   await loadPurchaseOrders();
@@ -51,6 +52,17 @@ export async function renderPurchaseOrders() {
           </div>
         </form>
       </div>
+    </div>
+
+    <div id="deleteConfirmationModal" class="modal">
+        <div class="modal-content">
+            <h2>Confirm Deletion</h2>
+            <p id="deleteConfirmationMessage"></p>
+            <div class="form-actions">
+                <button id="confirmDelete" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+                <button id="cancelDelete" class="btn btn-secondary" onclick="cancelDelete()">Cancel</button>
+            </div>
+        </div>
     </div>
   `;
 }
@@ -164,13 +176,28 @@ window.deletePurchaseOrder = async function(id) {
   const purchaseOrder = purchaseOrders.find(po => po.id === id);
   if (!purchaseOrder) return;
 
-  if (!confirm(`Are you sure you want to delete purchase order for ${purchaseOrder.itemName}?`)) return;
-
-  try {
-    await deleteDoc(doc(db, 'purchase_orders', id));
-    await loadPurchaseOrders();
-    document.getElementById('pageContent').innerHTML = await renderPurchaseOrders();
-  } catch (error) {
-    console.error('Error deleting purchase order:', error);
-  }
+  purchaseOrderToDeleteId = id;
+  const modal = document.getElementById('deleteConfirmationModal');
+  const message = document.getElementById('deleteConfirmationMessage');
+  message.textContent = `Are you sure you want to delete purchase order for ${purchaseOrder.itemName}?`;
+  modal.classList.add('active');
 };
+
+window.confirmDelete = async function() {
+    if (purchaseOrderToDeleteId) {
+        try {
+            await deleteDoc(doc(db, 'purchase_orders', purchaseOrderToDeleteId));
+            await loadPurchaseOrders();
+            document.getElementById('pageContent').innerHTML = await renderPurchaseOrders();
+        } catch (error) {
+            console.error('Error deleting purchase order:', error);
+        }
+    }
+    cancelDelete();
+}
+
+window.cancelDelete = function() {
+    const modal = document.getElementById('deleteConfirmationModal');
+    modal.classList.remove('active');
+    purchaseOrderToDeleteId = null;
+}

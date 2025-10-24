@@ -1,6 +1,7 @@
 import { db, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from '../firebase-config.js';
 
 let employees = [];
+let employeeToDeleteId = null;
 
 export async function renderEmployees() {
   await loadEmployees();
@@ -55,6 +56,17 @@ export async function renderEmployees() {
           </div>
         </form>
       </div>
+    </div>
+
+    <div id="deleteConfirmationModal" class="modal">
+        <div class="modal-content">
+            <h2>Confirm Deletion</h2>
+            <p id="deleteConfirmationMessage"></p>
+            <div class="form-actions">
+                <button id="confirmDelete" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+                <button id="cancelDelete" class="btn btn-secondary" onclick="cancelDelete()">Cancel</button>
+            </div>
+        </div>
     </div>
   `;
 }
@@ -172,13 +184,28 @@ window.deleteEmployee = async function(id) {
   const employee = employees.find(emp => emp.id === id);
   if (!employee) return;
 
-  if (!confirm(`Are you sure you want to delete ${employee.name}?`)) return;
-
-  try {
-    await deleteDoc(doc(db, 'employees', id));
-    await loadEmployees();
-    document.getElementById('pageContent').innerHTML = await renderEmployees();
-  } catch (error) {
-    console.error('Error deleting employee:', error);
-  }
+  employeeToDeleteId = id;
+  const modal = document.getElementById('deleteConfirmationModal');
+  const message = document.getElementById('deleteConfirmationMessage');
+  message.textContent = `Are you sure you want to delete ${employee.name}?`;
+  modal.classList.add('active');
 };
+
+window.confirmDelete = async function() {
+    if (employeeToDeleteId) {
+        try {
+            await deleteDoc(doc(db, 'employees', employeeToDeleteId));
+            await loadEmployees();
+            document.getElementById('pageContent').innerHTML = await renderEmployees();
+        } catch (error) {
+            console.error('Error deleting employee:', error);
+        }
+    }
+    cancelDelete();
+}
+
+window.cancelDelete = function() {
+    const modal = document.getElementById('deleteConfirmationModal');
+    modal.classList.remove('active');
+    employeeToDeleteId = null;
+}

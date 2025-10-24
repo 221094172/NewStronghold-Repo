@@ -2,6 +2,7 @@ import { db, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from '../f
 
 let services = [];
 let filteredServices = [];
+let serviceToDeleteId = null;
 
 export async function renderServices() {
   await loadServices();
@@ -70,6 +71,17 @@ export async function renderServices() {
           </div>
         </form>
       </div>
+    </div>
+
+    <div id="deleteConfirmationModal" class="modal">
+        <div class="modal-content">
+            <h2>Confirm Deletion</h2>
+            <p id="deleteConfirmationMessage"></p>
+            <div class="form-actions">
+                <button id="confirmDelete" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+                <button id="cancelDelete" class="btn btn-secondary" onclick="cancelDelete()">Cancel</button>
+            </div>
+        </div>
     </div>
   `;
 }
@@ -188,17 +200,32 @@ window.deleteService = async function(id) {
   const service = services.find(s => s.id === id);
   if (!service) return;
 
-  if (!confirm(`Are you sure you want to delete this service for ${service.clientName}?`)) return;
-
-  try {
-    await deleteDoc(doc(db, 'services', id));
-    await loadServices();
-    filteredServices = [...services];
-    document.getElementById('servicesTableContainer').innerHTML = renderServicesTable();
-  } catch (error) {
-    console.error('Error deleting service:', error);
-  }
+  serviceToDeleteId = id;
+  const modal = document.getElementById('deleteConfirmationModal');
+  const message = document.getElementById('deleteConfirmationMessage');
+  message.textContent = `Are you sure you want to delete this service for ${service.clientName}?`;
+  modal.classList.add('active');
 };
+
+window.confirmDelete = async function() {
+    if (serviceToDeleteId) {
+        try {
+            await deleteDoc(doc(db, 'services', serviceToDeleteId));
+            await loadServices();
+            filteredServices = [...services];
+            document.getElementById('servicesTableContainer').innerHTML = renderServicesTable();
+        } catch (error) {
+            console.error('Error deleting service:', error);
+        }
+    }
+    cancelDelete();
+}
+
+window.cancelDelete = function() {
+    const modal = document.getElementById('deleteConfirmationModal');
+    modal.classList.remove('active');
+    serviceToDeleteId = null;
+}
 
 window.filterServices = function() {
     const searchTerm = document.getElementById('serviceSearchInput').value.toLowerCase();
