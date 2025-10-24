@@ -17,7 +17,7 @@ export async function renderEmployees() {
         <h2>Employee List</h2>
         <button class="btn btn-primary" onclick="openEmployeeModal()">Add Employee</button>
       </div>
-      <div class="table-container">
+      <div class="table-container" id="employeesTableContainer">
         ${employees.length === 0 ? renderEmptyState() : renderEmployeesTable()}
       </div>
     </div>
@@ -158,7 +158,7 @@ window.handleEmployeeSubmit = async function(event) {
 
     closeEmployeeModal();
     await loadEmployees();
-    document.getElementById('pageContent').innerHTML = await renderEmployees();
+    document.getElementById('employeesTableContainer').innerHTML = renderEmployeesTable();
   } catch (error) {
     console.error('Error saving employee:', error);
   }
@@ -196,7 +196,7 @@ window.confirmDelete = async function() {
         try {
             await deleteDoc(doc(db, 'employees', employeeToDeleteId));
             await loadEmployees();
-            document.getElementById('pageContent').innerHTML = await renderEmployees();
+            document.getElementById('employeesTableContainer').innerHTML = renderEmployeesTable();
         } catch (error) {
             console.error('Error deleting employee:', error);
         }

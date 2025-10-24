@@ -17,7 +17,7 @@ export async function renderDepartments() {
         <h2>Department List</h2>
         <button class="btn btn-primary" onclick="openDepartmentModal()">Add Department</button>
       </div>
-      <div class="table-container">
+      <div class="table-container" id="departmentsTableContainer">
          ${departments.length === 0 ? renderEmptyState() : renderDepartmentsTable()}
       </div>
     </div>
@@ -137,7 +137,7 @@ window.handleDepartmentSubmit = async function(event) {
 
     closeDepartmentModal();
     await loadDepartments();
-    document.getElementById('pageContent').innerHTML = await renderDepartments();
+    document.getElementById('departmentsTableContainer').innerHTML = renderDepartmentsTable();
   } catch (error) {
     console.error('Error saving department:', error);
   }
@@ -172,7 +172,7 @@ window.confirmDelete = async function() {
         try {
             await deleteDoc(doc(db, 'departments', departmentToDeleteId));
             await loadDepartments();
-            document.getElementById('pageContent').innerHTML = await renderDepartments();
+            document.getElementById('departmentsTableContainer').innerHTML = renderDepartmentsTable();
         } catch (error) {
             console.error('Error deleting department:', error);
         }
