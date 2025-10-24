@@ -188,6 +188,8 @@ window.deleteService = async function(id) {
   const service = services.find(s => s.id === id);
   if (!service) return;
 
+  if (!confirm(`Are you sure you want to delete this service for ${service.clientName}?`)) return;
+
   try {
     await deleteDoc(doc(db, 'services', id));
     await loadServices();

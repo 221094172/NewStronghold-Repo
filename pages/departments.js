@@ -148,6 +148,8 @@ window.deleteDepartment = async function(id) {
   const department = departments.find(dept => dept.id === id);
   if (!department) return;
 
+  if (!confirm(`Are you sure you want to delete ${department.name}?`)) return;
+
   try {
     await deleteDoc(doc(db, 'departments', id));
     await loadDepartments();

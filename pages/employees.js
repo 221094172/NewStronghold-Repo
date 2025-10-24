@@ -172,6 +172,8 @@ window.deleteEmployee = async function(id) {
   const employee = employees.find(emp => emp.id === id);
   if (!employee) return;
 
+  if (!confirm(`Are you sure you want to delete ${employee.name}?`)) return;
+
   try {
     await deleteDoc(doc(db, 'employees', id));
     await loadEmployees();

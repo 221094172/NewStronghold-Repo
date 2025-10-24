@@ -164,6 +164,8 @@ window.deletePurchaseOrder = async function(id) {
   const purchaseOrder = purchaseOrders.find(po => po.id === id);
   if (!purchaseOrder) return;
 
+  if (!confirm(`Are you sure you want to delete purchase order for ${purchaseOrder.itemName}?`)) return;
+
   try {
     await deleteDoc(doc(db, 'purchase_orders', id));
     await loadPurchaseOrders();
