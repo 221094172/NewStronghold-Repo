@@ -1,5 +1,6 @@
 import { db, collection, getDocs } from '../firebase-config.js';
 
+// Implement your counts of each section(page), with javascript here/ this part acts as a calculation logic
 export async function renderDashboard() {
   const [employeesCount, departmentsCount, servicesCount, purchaseOrdersCount] = await Promise.all([
     getCollectionCount('employees'),
@@ -7,7 +8,7 @@ export async function renderDashboard() {
     getCollectionCount('services'),
     getCollectionCount('purchase_orders')
   ]);
-
+// You return your count collections into your cards, this is a return function
   return `
     <div class="page-header">
       <h1>Dashboard</h1>
@@ -44,7 +45,7 @@ export async function renderDashboard() {
     </div>
   `;
 }
-
+// synchronize your database with frontend (Keep data up to date), This code has Exception handling.
 async function getCollectionCount(collectionName) {
   try {
     const querySnapshot = await getDocs(collection(db, collectionName));
