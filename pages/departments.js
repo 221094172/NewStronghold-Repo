@@ -1,10 +1,10 @@
 import { db, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from '../firebase-config.js';
-
+//initialize collection to departments
 let departments = [];
 
 export async function renderDepartments() {
   await loadDepartments();
-
+//at   ${departments.length === 0 ? renderEmptyState() : renderDepartmentsTable()}, collects what in the database by string, and than populates it in tables on the frontrnd in each page 
   return `
     <div class="page-header">
       <h1>Departments</h1>
@@ -17,7 +17,7 @@ export async function renderDepartments() {
         <button class="btn btn-primary" onclick="openDepartmentModal()">Add Department</button>
       </div>
       <div class="table-container">
-        ${departments.length === 0 ? renderEmptyState() : renderDepartmentsTable()}
+         ${departments.length === 0 ? renderEmptyState() : renderDepartmentsTable()}
       </div>
     </div>
 
@@ -46,7 +46,7 @@ export async function renderDepartments() {
     </div>
   `;
 }
-
+//This important, its the whole building logic of the table
 function renderEmptyState() {
   return `
     <div class="empty-state">
@@ -55,7 +55,7 @@ function renderEmptyState() {
     </div>
   `;
 }
-
+// here your table is created
 function renderDepartmentsTable() {
   return `
     <table>
@@ -147,8 +147,6 @@ window.editDepartment = async function(id) {
 window.deleteDepartment = async function(id) {
   const department = departments.find(dept => dept.id === id);
   if (!department) return;
-
-  if (!confirm(`Are you sure you want to delete ${department.name}?`)) return;
 
   try {
     await deleteDoc(doc(db, 'departments', id));

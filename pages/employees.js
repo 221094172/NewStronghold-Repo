@@ -67,7 +67,7 @@ function renderEmptyState() {
     </div>
   `;
 }
-
+//join function brings elememts together as an array to be presented in the frontend
 function renderEmployeesTable() {
   return `
     <table>
@@ -101,7 +101,7 @@ function renderEmployeesTable() {
     </table>
   `;
 }
-
+//sync data with frontend
 async function loadEmployees() {
   try {
     const querySnapshot = await getDocs(collection(db, 'employees'));
@@ -171,8 +171,6 @@ window.editEmployee = async function(id) {
 window.deleteEmployee = async function(id) {
   const employee = employees.find(emp => emp.id === id);
   if (!employee) return;
-
-  if (!confirm(`Are you sure you want to delete ${employee.name}?`)) return;
 
   try {
     await deleteDoc(doc(db, 'employees', id));
