@@ -51,7 +51,7 @@ export async function renderDepartments() {
             <h2>Confirm Deletion</h2>
             <p id="deleteConfirmationMessage"></p>
             <div class="form-actions">
-                <button id="confirmDelete" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+                <button id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
                 <button id="cancelDelete" class="btn btn-secondary" onclick="cancelDelete()">Cancel</button>
             </div>
         </div>
@@ -164,10 +164,14 @@ window.deleteDepartment = async function(id) {
   const modal = document.getElementById('deleteConfirmationModal');
   const message = document.getElementById('deleteConfirmationMessage');
   message.textContent = `Are you sure you want to delete ${department.name}?`;
+  
+  const confirmBtn = document.getElementById('confirmDeleteBtn');
+  confirmBtn.onclick = () => confirmDepartmentDelete();
+  
   modal.classList.add('active');
 };
 
-window.confirmDelete = async function() {
+async function confirmDepartmentDelete() {
     if (departmentToDeleteId) {
         try {
             await deleteDoc(doc(db, 'departments', departmentToDeleteId));
